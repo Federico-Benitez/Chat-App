@@ -1,4 +1,6 @@
 "use strict";
+const { isStreamLike } = require("combined-stream");
+const { isWeakMap } = require("lodash");
 const { Model, DATE } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
@@ -21,7 +23,13 @@ module.exports = (sequelize, DataTypes) => {
       email: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true
+        unique: true,
+        validate: {
+          isEmail: {
+            args: true,
+            msg: "tiene que ser una direccion valida de email"
+          }
+        }
       },
       password: {
         type: DataTypes.STRING,

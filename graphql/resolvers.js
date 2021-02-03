@@ -39,11 +39,11 @@ module.exports = {
         }
 
         //Comprobar si el username/ email existe
-        const userByUsername = await User.findOne({ where: { username } });
-        const userByEmail = await User.findOne({ where: { email } });
+        // const userByUsername = await User.findOne({ where: { username } });
+        // const userByEmail = await User.findOne({ where: { email } });
 
-        if (userByUsername) errors.username = "El nombre de usuario ya existe";
-        if (userByEmail) errors.email = "Ya existe una cuenta con este email";
+        // if (userByUsername) errors.username = "El nombre de usuario ya existe";
+        // if (userByEmail) errors.email = "Ya existe una cuenta con este email";
 
         //Comprobar si existen errores
         if (Object.keys(errors).length > 0) {
@@ -63,6 +63,11 @@ module.exports = {
         return user;
       } catch (err) {
         console.log(err);
+        if (err.name === "SequelizeUniqueConstraintError") {
+          err.errors.forEach(
+            (e) => (errors[e.path] = `${e.path} ya esta siendo utilizado`)
+          );
+        }
         throw new UserInputError("Bad input", { errors: err });
       }
     }
