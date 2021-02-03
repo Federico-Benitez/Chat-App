@@ -4,13 +4,16 @@
     "graphql": "^14.7.0"
   },
   "scripts": {
+    "dev": "nodemon server.js",
     "start": "node server.js"
   },
   "name": "chat-app",
   "description": "Una aplicación de chat utilizando React y Node",
   "version": "1.0.0",
   "main": "server.js",
-  "devDependencies": {},
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Federico-Benitez/Chat-App.git"
