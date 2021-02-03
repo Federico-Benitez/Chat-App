@@ -1,13 +1,14 @@
+const { User } = require("../models");
+
 module.exports = {
   Query: {
-    getUsers: () => {
-      const users = [
-        { username: "Micaela", email: "micaela@email.com" },
-        { username: "Fede", email: "fede@email.com" },
-        { username: "Carlos", email: "carlos@email.com" }
-      ];
-
-      return users;
+    getUsers: async () => {
+      try {
+        const users = await User.findAll();
+        return users;
+      } catch (err) {
+        console.log(err);
+      }
     }
   }
 };
