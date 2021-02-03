@@ -1,0 +1,24 @@
+{
+  "dependencies": {
+    "apollo-server": "^2.19.2",
+    "graphql": "^14.7.0"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "name": "chat-app",
+  "description": "Una aplicación de chat utilizando React y Node",
+  "version": "1.0.0",
+  "main": "server.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Federico-Benitez/Chat-App.git"
+  },
+  "author": "Federico Benitez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Federico-Benitez/Chat-App/issues"
+  },
+  "homepage": "https://github.com/Federico-Benitez/Chat-App#readme"
+}
