@@ -52,15 +52,15 @@ module.exports = {
         });
 
         if (!user) {
-          errors.username = "user not found";
+          errors.username = "Usuario no válido";
           throw new UserInputError("user not found", { errors });
         }
 
         const correctPassword = await bcrypt.compare(password, user.password);
 
         if (!correctPassword) {
-          errors.password = "password is incorrect";
-          throw new AuthenticationError("password is incorrect", { errors });
+          errors.password = "La contraseña es incorrecta";
+          throw new UserInputError("password is incorrect", { errors });
         }
 
         const token = jwt.sign(
