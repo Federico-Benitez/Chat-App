@@ -1,5 +1,26 @@
 import React, { useState } from "react";
-import { Row, Col, Form, Button } from "react-bootstrap";
+import { Row, Col, Form, Button, Link } from "react-bootstrap";
+import { gql, useMutation } from "@apollo/client";
+
+const REGISTER_USER = gql`
+  mutation register(
+    $username: String!
+    $email: String!
+    $password: String!
+    $confirmPassword: String!
+  ) {
+    register(
+      username: $username
+      email: $email
+      password: $password
+      confirmPassword: $confirmPassword
+    ) {
+      username
+      email
+      createdAt
+    }
+  }
+`;
 
 export default function Register() {
   const [variables, setVariables] = useState({
@@ -8,54 +29,72 @@ export default function Register() {
     password: "",
     confirmPassword: ""
   });
+
+  const [errors, setErrors] = useState({});
+
+  const [registerUser, { loading }] = useMutation(REGISTER_USER, {
+    update(_, res) {
+      console.log(res);
+    },
+    onError: (err) => setErrors(err.graphQLErrors[0].extensions.errors)
+  });
+
   const submitRegisterForm = (e) => {
     e.preventDefault();
-    console.log(variables);
+    registerUser({ variables });
   };
   return (
     <Row className="bg-white py-5 justify-content-center">
-      <Col sm={8} md={6} lg={4} className>
+      <Col sm={8} md={6} lg={4}>
         <h1 className="text-center">Registro</h1>
-
         <Form onSubmit={submitRegisterForm}>
           <Form.Group>
-            <Form.Label>Email</Form.Label>
+            <Form.Label className={errors.email && "text-danger"}>
+              {errors.email ?? "Email"}
+            </Form.Label>
             <Form.Control
               type="email"
               value={variables.email}
+              className={errors.email && "is-invalid"}
               onChange={(e) =>
                 setVariables({ ...variables, email: e.target.value })
               }
             />
-            <Form.Text className="text-muted">
-              No vamos a compartir tu email con nadie.
-            </Form.Text>
           </Form.Group>
           <Form.Group>
-            <Form.Label>Nombre de usuario</Form.Label>
+            <Form.Label className={errors.username && "text-danger"}>
+              {errors.username ?? "Nombre de Usuario"}
+            </Form.Label>
             <Form.Control
               type="text"
               value={variables.username}
+              className={errors.username && "is-invalid"}
               onChange={(e) =>
                 setVariables({ ...variables, username: e.target.value })
               }
             />
           </Form.Group>
           <Form.Group>
-            <Form.Label>Contraseña</Form.Label>
+            <Form.Label className={errors.password && "text-danger"}>
+              {errors.password ?? "Contraseña"}
+            </Form.Label>
             <Form.Control
               type="password"
               value={variables.password}
+              className={errors.password && "is-invalid"}
               onChange={(e) =>
                 setVariables({ ...variables, password: e.target.value })
               }
             />
           </Form.Group>
           <Form.Group>
-            <Form.Label>Confirmar contraseña</Form.Label>
+            <Form.Label className={errors.confirmPassword && "text-danger"}>
+              {errors.confirmPassword ?? "Confirmar contraseña"}
+            </Form.Label>
             <Form.Control
               type="password"
               value={variables.confirmPassword}
+              className={errors.confirmPassword && "is-invalid"}
               onChange={(e) =>
                 setVariables({
                   ...variables,
@@ -64,10 +103,11 @@ export default function Register() {
               }
             />
           </Form.Group>
-          <div className="text-right">
-            <Button variant="success" type="submit">
-              Registrarse
+          <div className="text-center">
+            <Button variant="success" type="submit" disabled={loading}>
+              {loading ? "loading.." : "Register"}
             </Button>
+            <br />
           </div>
         </Form>
       </Col>
