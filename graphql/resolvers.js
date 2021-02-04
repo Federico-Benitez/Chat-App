@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const { UserInputError } = require("apollo-server");
+const { UserInputError, AuthenticationError } = require("apollo-server");
 
 const { User } = require("../models");
 
@@ -11,6 +11,44 @@ module.exports = {
         return users;
       } catch (err) {
         console.log(err);
+      }
+    },
+    login: async (_, args) => {
+      const { username, password } = args;
+      let errors = {};
+
+      try {
+        if (username.trim === "") {
+          errors.username = "Ingrese un nombre de usuario";
+          throw new UserInputError("user empty", { errors });
+        }
+        if (password === "") {
+          errors.password = "Ingrese la contraseña";
+          throw new UserInputError("password empty", { errors });
+        }
+
+        const user = await User.findOne({
+          where: {
+            username
+          }
+        });
+
+        if (!user) {
+          errors.username = "user not found";
+          throw new UserInputError("user not found", { errors });
+        }
+
+        const correctPassword = await bcrypt.compare(password, user.password);
+
+        if (!correctPassword) {
+          errors.password = "password is incorrect";
+          throw new AuthenticationError("password is incorrect", { errors });
+        }
+
+        return user;
+      } catch (err) {
+        console.log(err);
+        throw err;
       }
     }
   },
@@ -70,7 +108,7 @@ module.exports = {
         } else if (err.name === "SequelizeValidationError") {
           err.errors.forEach((e) => (errors[e.path] = e.message));
         }
-        throw new UserInputError("Bad input", { errors: err });
+        throw new UserInputError("Bad input", { errors });
       }
     }
   }
