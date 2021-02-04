@@ -111,6 +111,8 @@ module.exports = {
 
         //Encriptar contraseña
         password = await bcrypt.hash(password, 6);
+        //poner todo en minusculas el nombre de usuario
+        username = username.toLowerCase();
 
         //Crear usuario
         const user = await User.create({

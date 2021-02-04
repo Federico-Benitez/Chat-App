@@ -1,8 +1,35 @@
 const { UserInputError, AuthenticationError } = require("apollo-server");
-
+const { Op } = require("sequelize");
 const { User, Message } = require("../../models");
 
 module.exports = {
+  Query: {
+    getMessages: async (parent, { from }, { user }) => {
+      try {
+        if (!user) throw new AuthenticationError("Unauthenticated");
+        const receptor = await User.findOne({
+          where: { username: from }
+        });
+        if (!receptor)
+          throw new UserInputError("No existen mensajes con esta persona");
+
+        const userNames = [user.username, receptor.username];
+
+        const messages = await Message.findAll({
+          where: {
+            from: { [Op.in]: userNames },
+            to: { [Op.in]: userNames }
+          },
+          order: [["createdAt", "DESC"]]
+        });
+
+        return messages;
+      } catch (err) {
+        console.log(err);
+        throw err;
+      }
+    }
+  },
   Mutation: {
     sendMessage: async (parent, { to, content }, { user }) => {
       try {
@@ -12,8 +39,9 @@ module.exports = {
 
         if (!receptor) {
           throw new UserInputError("Destinatario no encontrado");
-        } else if (receptor.username === user.username) {
-          //TODO: que se pueda mandar a uno mismo mensajes para guardar cosas
+        }
+        if (receptor.username === user.username) {
+          console.log("aca entra");
           throw new UserInputError("No puedes mandarte mensajes a ti mismo");
         }
 
