@@ -1,7 +1,7 @@
 
 $blue: #166FE5;
 $green: #42b72a;
-$gray-600: rgb(245,245,245);
+$gray-600: rgb(236, 233, 233);
 $paragraph-margin-bottom:0 ;
 
 
@@ -15,4 +15,8 @@ body{
         rgba(253, 29, 29, 0.9) 50%,
         rgba(252, 176, 69, 0.9) 100%
         );
+}
+
+.user-div:hover{
+    background-color: rgb(250,250,250);
 }
