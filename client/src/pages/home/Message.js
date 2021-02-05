@@ -11,7 +11,7 @@ export default function Message({ message }) {
 
   return (
     <OverlayTrigger
-      placement={sent ? "right" : "left"}
+      placement={sent ? "left" : "right"}
       overlay={
         <Tooltip>
           {moment(message.createdAt).format("MMMM DD, YYYY @ h:mm a")}

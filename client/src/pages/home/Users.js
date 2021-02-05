@@ -5,6 +5,9 @@ import classNames from "classnames";
 
 import { useMessageDispatch, useMessageState } from "../../context/message";
 
+const defaultPicture =
+  "https://www.hostpapa.com/knowledgebase/wp-content/uploads/2018/04/1-13.png";
+
 const GET_USERS = gql`
   query getUsers {
     getUsers {
@@ -55,7 +58,10 @@ export default function Users() {
             dispatch({ type: "SET_SELECTED_USER", payload: user.username })
           }
         >
-          <Image src={user.imageUrl} className="user-image " />
+          <Image
+            src={user.imageUrl || defaultPicture}
+            className="user-image "
+          />
           <div className="d-none d-md-block ml-2">
             <p className="text-success">{user.username}</p>
             <p className="font-weight-light">
