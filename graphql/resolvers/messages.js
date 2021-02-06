@@ -1,24 +1,29 @@
-const { UserInputError, AuthenticationError } = require("apollo-server");
+const {
+  UserInputError,
+  AuthenticationError,
+  withFilter
+} = require("apollo-server");
 const { Op } = require("sequelize");
-const { User, Message } = require("../../models");
+
+const { Message, User } = require("../../models");
 
 module.exports = {
   Query: {
     getMessages: async (parent, { from }, { user }) => {
       try {
         if (!user) throw new AuthenticationError("Unauthenticated");
-        const receptor = await User.findOne({
+
+        const otherUser = await User.findOne({
           where: { username: from }
         });
-        if (!receptor)
-          throw new UserInputError("No existen mensajes con esta persona");
+        if (!otherUser) throw new UserInputError("User not found");
 
-        const userNames = [user.username, receptor.username];
+        const usernames = [user.username, otherUser.username];
 
         const messages = await Message.findAll({
           where: {
-            from: { [Op.in]: userNames },
-            to: { [Op.in]: userNames }
+            from: { [Op.in]: usernames },
+            to: { [Op.in]: usernames }
           },
           order: [["createdAt", "DESC"]]
         });
@@ -31,37 +36,55 @@ module.exports = {
     }
   },
   Mutation: {
-    sendMessage: async (parent, { to, content }, { user }) => {
+    sendMessage: async (parent, { to, content }, { user, pubsub }) => {
       try {
         if (!user) throw new AuthenticationError("Unauthenticated");
-        //buscar a quien va dirigido el mensaje
-        const receptor = await User.findOne({ where: { username: to } });
 
-        if (!receptor) {
-          throw new UserInputError("Destinatario no encontrado");
-        }
-        if (receptor.username === user.username) {
-          console.log("aca entra");
-          throw new UserInputError("No puedes mandarte mensajes a ti mismo");
+        const recipient = await User.findOne({ where: { username: to } });
+
+        if (!recipient) {
+          throw new UserInputError("User not found");
+        } else if (recipient.username === user.username) {
+          throw new UserInputError("You cant message yourself");
         }
 
         if (content.trim() === "") {
-          //el receptor fue encontrado
-          //comprobacion si el mensaje esta vacio
-          throw new UserInputError("Mensaje vacio");
+          throw new UserInputError("Message is empty");
         }
-        //creamos el mensaje
+
         const message = await Message.create({
           from: user.username,
           to,
           content
         });
 
+        pubsub.publish("NEW_MESSAGE", { newMessage: message });
+
         return message;
       } catch (err) {
         console.log(err);
         throw err;
       }
+    }
+  },
+  Subscription: {
+    newMessage: {
+      subscribe: withFilter(
+        (_, __, { pubsub, user }) => {
+          if (!user) throw new AuthenticationError("Unauthenticated");
+          return pubsub.asyncIterator(["NEW_MESSAGE"]);
+        },
+        ({ newMessage }, _, { user }) => {
+          if (
+            newMessage.from === user.username ||
+            newMessage.to === user.username
+          ) {
+            return true;
+          }
+
+          return false;
+        }
+      )
     }
   }
 };

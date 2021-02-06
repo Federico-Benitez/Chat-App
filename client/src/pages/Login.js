@@ -33,7 +33,7 @@ export default function Register(props) {
         type: "LOGIN",
         payload: data.login
       });
-      props.history.push("/");
+      window.location.href = "/";
     }
   });
 
