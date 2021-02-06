@@ -50,3 +50,35 @@ body{
 .icon-send{
     height: max-content;
 }
+
+.react-button-popover{
+    height: 30px
+}
+
+.react-icon-button{
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    font-size: 1rem;
+    transition: 0.05s;
+
+    &:hover{
+        text-decoration: none;
+        font-size: 1.5rem;
+    }
+
+
+}
+
+.btn:focus{
+    box-shadow: none;
+}
+
+.reactions-div {
+    position: absolute;
+    background-color: rgb(201, 201, 201);
+    right: -10px;
+    bottom: -20px;
+    font-size: 1rem;
+  }
