@@ -1,3 +1,4 @@
+import React from "react";
 import {
   ApolloClient,
   InMemoryCache,
@@ -5,16 +6,16 @@ import {
   createHttpLink,
   split
 } from "@apollo/client";
-import { getMainDefinition } from "@apollo/client/utilities";
 import { setContext } from "@apollo/client/link/context";
 import { WebSocketLink } from "@apollo/client/link/ws";
+import { getMainDefinition } from "@apollo/client/utilities";
 
 let httpLink = createHttpLink({
   uri: "/graphql/"
 });
 
 const authLink = setContext((_, { headers }) => {
-  // get the authentication token from local storage if it exists
+  // // get the authentication token from local storage if it exists
   const token = localStorage.getItem("token");
   // return the headers to the context so httpLink can read them
   return {
@@ -26,10 +27,11 @@ const authLink = setContext((_, { headers }) => {
 });
 
 httpLink = authLink.concat(httpLink);
+
 const host = window.location.host;
 
 const wsLink = new WebSocketLink({
-  uri: `ws://${host}/graphql`,
+  uri: `ws://${host}/graphql/`,
   options: {
     reconnect: true,
     connectionParams: {
